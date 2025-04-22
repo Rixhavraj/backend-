@@ -18,7 +18,7 @@ app.get('/login', (req, res) => {
       <style>
         body {
           font-family: Arial, sans-serif;
-          background: #f0f2f5;
+          background:rgb(0, 0, 0);
           display: flex;
           justify-content: center;
           align-items: center;
