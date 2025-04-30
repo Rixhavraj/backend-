@@ -1,15 +1,28 @@
 const express = require('express')
 const app = express() //import express from "express"
+const mongoose = require('mongoose')
+const Path = require('path')
 const port = 3000
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
+app.use(express.urlencoded({extended: true}));
+app.use(express.json());
+
+mongoose.connect('mongodb://127.0.0.1:27017/login');
+const db = mongoose.connection;
+db.once('open', ()=>{
+  console.log("mongo db connectes succesfully!!!")
 })
 
+const userSchema = new mongoose.Schema({
+  Username: { type: String },
+  Password: { type: String }
 
-app.get('/login', (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
+});
+
+const users = mongoose.model("data", userSchema)
+
+app.get('/', (req, res) => {
+  res.send(`<!DOCTYPE html>
     <html lang="en">
     <head>
       <meta charset="UTF-8">
@@ -61,15 +74,30 @@ app.get('/login', (req, res) => {
     <body>
       <div class="login-container">
         <h2>Login</h2>
-        <form>
-          <input type="text" placeholder="Username" required />
-          <input type="password" placeholder="Password" required />
+        <form method="POST" action="/backand/index.js">
+          <input name="Username" type="text" placeholder="Username" required />
+          <input name="Password" type="password" placeholder="Password" required />
           <button type="submit">Login</button>
         </form>
       </div>
     </body>
-    </html>
-  `);
+    </html>`)
+});
+
+
+app.post('/', async(req, res)=>{
+  const { Username, Password } = req.body;
+  const user = new user({
+    Username, Password
+  });
+  try{
+  await user.save();
+  console.log("saved to db", user);
+  res.send("Form submitted successfully!!!");
+  } catch(err){
+    console.log("Error saving to db", err);
+    res.status(500).send("error saving data");
+  }
 });
 
 
